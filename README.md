@@ -3,7 +3,7 @@
 ```
 //打包
 //cmd 设置环境变量
-set GOARCH=arm64
+set GOARCH=amd64
 //linux windows
 set GOOS=linux
 go build
