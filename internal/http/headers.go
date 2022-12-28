@@ -122,6 +122,8 @@ const (
 	AmzSecurityToken        = "X-Amz-Security-Token"
 	AmzDecodedContentLength = "X-Amz-Decoded-Content-Length"
 	AmzTrailer              = "X-Amz-Trailer"
+	////授权文件夹
+	AmzFolderPath           = "X-Amz-Folder-Path"
 
 	AmzMetaUnencryptedContentLength = "X-Amz-Meta-X-Amz-Unencrypted-Content-Length"
 	AmzMetaUnencryptedContentMD5    = "X-Amz-Meta-X-Amz-Unencrypted-Content-Md5"

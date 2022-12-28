@@ -271,6 +271,8 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 		xhttp.AmzSignedHeaders,
 		xhttp.AmzCredential,
 		xhttp.AmzSignature,
+		//授权文件夹
+		xhttp.AmzFolderPath,
 	)
 
 	// Add missing query parameters if any provided in the request URL
@@ -299,6 +301,17 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 	if req.Form.Get(xhttp.AmzCredential) != query.Get(xhttp.AmzCredential) {
 		return ErrSignatureDoesNotMatch
 	}
+
+	//校验请求路径与文件夹路径是否一致
+	queryFolderPath := req.Form.Get(xhttp.AmzFolderPath)
+	reqUrlPath := s3utils.EncodePath(req.URL.Path)
+	if	len(queryFolderPath)==0{
+		queryFolderPath=reqUrlPath
+	}
+	if !strings.HasPrefix(reqUrlPath,queryFolderPath) {
+		return ErrSignatureDoesNotMatch
+	}
+
 	// Verify if sha256 payload query is same.
 	if clntHashedPayload != "" && clntHashedPayload != query.Get(xhttp.AmzContentSha256) {
 		return ErrContentSHA256Mismatch
@@ -311,7 +324,7 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 	// Verify finally if signature is same.
 
 	// Get canonical request.
-	presignedCanonicalReq := getCanonicalRequest(extractedSignedHeaders, hashedPayload, encodedQuery, req.URL.Path, req.Method)
+	presignedCanonicalReq := getCanonicalRequest(extractedSignedHeaders, hashedPayload, encodedQuery, queryFolderPath, req.Method)
 
 	// Get string to sign from canonical request.
 	presignedStringToSign := getStringToSign(presignedCanonicalReq, t, pSignValues.Credential.getScope())
